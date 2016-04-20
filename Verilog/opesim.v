@@ -1,12 +1,12 @@
 module comp_8sim();
-    reg [8-1:0] ina, inb;
+    reg [32-1:0] ina, inb;
     reg clk, rst_n;
     wire g, e;
 
-    comp_8 comp_8(ina, inb, clk, rst_n, g, e);
+    comp_32 comp_32(ina, inb, clk, rst_n, g, e);
 
     initial begin
-	$dumpfile("comp_8sim.vcd");
+	$dumpfile("comp_32sim.vcd");
 	$dumpvars;
         $monitor("%t: %h %h => %b %b", $time, ina, inb, g, e);
 	clk <= 0;
@@ -15,17 +15,23 @@ module comp_8sim();
 
     initial begin
         #100 
-	    ina <= 8'b00000001;
-	    inb <= 8'b00000001;
+	    ina <= 32'h00000001;
+	    inb <= 32'h00000001;
 	#20
 	    rst_n <= 1;
 	#100
 	    rst_n <= 0;
 	#100
-	    ina <= 8'b00000010;
-	    inb <= 8'b00000100;
+	    ina <= 32'h00000010;
+	    inb <= 32'h00000100;
 	#20
 	    rst_n <= 1;
+    #100
+        rst_n <= 0;
+    #100
+        ina <= 32'h001fda13;
+        inb <= 32'h0001dedd;
+    #20 rst_n <= 1;
 	#200
 	    $finish;
     end

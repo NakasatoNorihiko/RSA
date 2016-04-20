@@ -19,7 +19,7 @@ module comp_32(
 
     reg [3-1:0] count;
     reg [32-1:0] rega, regb;
-    wire [8-1:0] a,b;
+    reg [8-1:0] a,b;
     wire g8, e8;
 
     comp_8 comp_8(a, b, g8, e8); 
@@ -34,10 +34,10 @@ module comp_32(
             a <= ina[32-1:24];
             b <= inb[32-1:24];
         end else begin
-            if (g8 == 1) begin
+            if (g8 == 1) begin // 大きかったらそこで止める
                 g <= 1;
                 e <= 0;
-            end else if (!e8) begin
+            end else if (!e8) begin // 等しくなかったらそこでやめる
                 g <= 0;
                 e <= 0;
             end else begin 
