@@ -52,11 +52,43 @@ void sub(unsigned char *a, unsigned char *b, unsigned char* diff, unsigned char 
 // nバイト整数同士の掛け算で2nバイトの整数を生む
 void mul(unsigned char *a, unsigned char *b, unsigned char* ans, unsigned char n)
 {
-    ans[0] = (char)((int)a[0] * (int)b[0] % pow_int(256,n));
-    ans[1] = (a[0] * b[0]) / pow_int(256, N);
+    char res_one[n+1];
+    int i, j;
+    for (i = 0; i < 2*n; i++) {
+        ans[i] = 0;
+    }
+
+    for (i = 0; i < n; i++) {
+        mul_one(a, b[i], res_one, n);
+        for (j = 0; j < n + 1; j++) {
+            ans[i+j] += res_one[j];
+        }
+    }
+//    ans[0] = (char)((int)a[0] * (int)b[0] % pow_int(256,n));
+//    ans[1] = (a[0] * b[0]) / pow_int(256, N);
     return;
 }
 
+// nバイト整数*1バイト整数の掛け算でn+1バイトの整数を生む
+void mul_one(unsigned char *a, unsigned char b, unsigned char *ans, unsigned char n)
+{
+    int i;
+    unsigned char carry = 0;
+
+    if (b == 0) {
+        for (i = 0; i < n+1; i++) {
+            ans[i] = 0;
+        }
+        return;
+    }
+    
+    for (i = 0; i < n; i++) {
+        ans[i] = (carry + ((unsigned int)a[i] * (unsigned int)b)) % 256;
+        carry  = (carry + ((unsigned int)a[i] * (unsigned int)b)) / 256;
+    }
+    ans[n] = carry;
+    return;
+}
 int pow_int(int x, int n)
 {
     int i;
@@ -67,6 +99,30 @@ int pow_int(int x, int n)
     return ans;
 }
 
+// nバイトの整数をmバイト左シフトする
+void left_shift(unsigned char *ori, unsigned char *res, unsigned char n, unsigned char m)
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        if (i >= m) {
+            res[i] = ori[i-m];
+        } else {
+            res[i] = 0;
+        }
+    }
+}
+
+void right_shift(unsigned char *ori, unsigned char *res, unsigned char n, unsigned char m)
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        if (i < n-m) {
+            res[i] = ori[i+m];
+        } else {
+            res[i] = 0;
+        }
+    }
+}
 // a > b なら1, a < bなら-1, a = bなら0を返す
 int comp(unsigned char *a, unsigned char *b, unsigned char n) 
 {
