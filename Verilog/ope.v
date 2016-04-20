@@ -128,6 +128,7 @@ module add_32(
     end
 endmodule 
 
+// 32bit減算器
 module sub_32(
     input  wire [32-1:0] ina, inb,
     input  wire clk,
@@ -135,7 +136,7 @@ module sub_32(
     output reg [64-1:0] result);
     
     reg  [3-1:0] count;
-    reg [32-1:0] rega, regb;
+    reg [32-1:0] bigger, smaller;
     wire [9-1:0] res;
     reg  [8-1:0] a,b;
     reg carry;
