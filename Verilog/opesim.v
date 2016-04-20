@@ -1,43 +1,43 @@
-module comp_8sim();
-    reg [32-1:0] ina, inb;
-    reg clk, rst_n;
-    wire g, e;
-
-    comp_32 comp_32(ina, inb, clk, rst_n, g, e);
-
-    initial begin
-	$dumpfile("comp_32sim.vcd");
-	$dumpvars;
-        $monitor("%t: %h %h => %b %b", $time, ina, inb, g, e);
-	clk <= 0;
-	rst_n <= 0;
-    end
-
-    initial begin
-        #100 
-	    ina <= 32'h00000001;
-	    inb <= 32'h00000001;
-	#20
-	    rst_n <= 1;
-	#100
-	    rst_n <= 0;
-	#100
-	    ina <= 32'h00000010;
-	    inb <= 32'h00000100;
-	#20
-	    rst_n <= 1;
-    #100
-        rst_n <= 0;
-    #100
-        ina <= 32'h001fda13;
-        inb <= 32'h0001dedd;
-    #20 rst_n <= 1;
-	#200
-	    $finish;
-    end
-
-    always #10 clk <= ~clk;
-endmodule
+// module comp_32sim();
+//     reg [32-1:0] ina, inb;
+//     reg clk, rst_n;
+//     wire g, e, ready_n;
+// 
+//     comp_32 comp_32(ina, inb, clk, rst_n, g, e, ready_n);
+// 
+//     initial begin
+// 	$dumpfile("comp_32sim.vcd");
+// 	$dumpvars;
+//         $monitor("%t: %h %h => %b %b", $time, ina, inb, g, e);
+// 	clk <= 0;
+// 	rst_n <= 0;
+//     end
+// 
+//     initial begin
+//         #100 
+// 	    ina <= 32'h00000001;
+// 	    inb <= 32'h00000001;
+// 	#20
+// 	    rst_n <= 1;
+// 	#100
+// 	    rst_n <= 0;
+// 	#100
+// 	    ina <= 32'h00000010;
+// 	    inb <= 32'h00000100;
+// 	#20
+// 	    rst_n <= 1;
+//     #100
+//         rst_n <= 0;
+//     #100
+//         ina <= 32'h001fda13;
+//         inb <= 32'h0001dedd;
+//     #20 rst_n <= 1;
+// 	#200
+// 	    $finish;
+//     end
+// 
+//     always #10 clk <= ~clk;
+// endmodule
 
 // module add_32sim();
 //     reg [32-1:0] ina, inb;
@@ -78,3 +78,49 @@ endmodule
 // 
 //     always #10 clk <= ~clk;
 // endmodule
+
+module mul_3232sim();
+    reg [32-1:0] ina;
+    reg [32-1:0]  inb;
+    reg clk, rst_n;
+    wire [64-1:0] result;
+    wire ready_n;
+    wire [64-1:0] inab;
+
+    mul_3232 mul_3232(ina, inb, clk, rst_n, result, ready_n);
+
+    assign inab = ina * inb;
+
+    initial begin
+	$dumpfile("mul_3232sim.vcd");
+	$dumpvars;
+        $monitor("%t: %h *  %h => %h (%h) %b", $time, ina, inb, result, inab, ready_n);
+	clk <= 0;
+	rst_n <= 0;
+    end
+
+    initial begin
+        #100 
+	    ina <= 32'h00000001;
+	    inb <= 32'h00000001;
+	#10
+	    rst_n <= 1;
+	#2000
+	    rst_n <= 0;
+	#10
+	    ina <= 32'h00000010;
+	    inb <= 32'h00000100;
+	#10
+	    rst_n <= 1;
+    #2000
+        rst_n <= 0;
+    #100
+        ina <= 32'hf81fda13;
+        inb <= 32'he301dedd;
+    #20 rst_n <= 1;
+	#2000
+	    $finish;
+    end
+
+    always #5 clk <= ~clk;
+endmodule

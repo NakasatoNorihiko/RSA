@@ -64,8 +64,6 @@ void mul(unsigned char *a, unsigned char *b, unsigned char* ans, unsigned char n
             ans[i+j] += res_one[j];
         }
     }
-//    ans[0] = (char)((int)a[0] * (int)b[0] % pow_int(256,n));
-//    ans[1] = (a[0] * b[0]) / pow_int(256, N);
     return;
 }
 
