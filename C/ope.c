@@ -126,7 +126,7 @@ void div_np1_n_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned i
         }
         ina -= (*q)*inb;
     }
-    printf("%d = %d *  %d + %d\n", ina, inb, *q, *r);
+    printf("ina=%d inb=%d *q=%d *r=%d\n", ina, inb, *q, *r);
 
     qq = (ina >> d*(n-1)) / (inb >> d*(n-1));
     if (qq == 0) {
@@ -137,10 +137,10 @@ void div_np1_n_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned i
 
     if (qq * inb > ina) {
         *q += qq - 1;
-        *r =(ina - *q * inb) >> k;
+        *r = (ina - qq * inb) >> k;
     } else {
         *q += qq;
-        *r = (ina - *q * inb) >> k;
+        *r = (ina - qq * inb) >> k;
     }
     printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
 }
