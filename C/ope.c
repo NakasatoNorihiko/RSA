@@ -87,6 +87,12 @@ void mul_one(unsigned char *a, unsigned char b, unsigned char *ans, unsigned cha
     ans[n] = carry;
     return;
 }
+
+// n+1桁の整数をn桁の整数で除算する
+// void div_np1_n(unsigned char *dividend, unsigned char *divisor, unsigned char *ans, unsigned char n) 
+// {
+//     
+// }
 int pow_int(int x, int n)
 {
     int i;

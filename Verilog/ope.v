@@ -1,181 +1,188 @@
-// 8bit比較器 a > b -> g:1 e:0, a == b -> 01, a < b -> 00
-module comp_8(
-    input wire [8-1:0] ina, inb,
-    output wire g, 
-    output wire e);
-    
-    assign g = (ina > inb);
-    assign e = (ina == inb);
-endmodule 
+// // 8bit比較器 a > b -> g:1 e:0, a == b -> 01, a < b -> 00
+// module comp_8(
+//     input wire [8-1:0] ina, inb,
+//     output wire g, 
+//     output wire e);
+//     
+//     assign g = (ina > inb);
+//     assign e = (ina == inb);
+// endmodule 
+// 
+// // 32bit比較器
+// // a > b -> 10, a < b -> 00, a == b -> 01を返す
+// module comp_32(
+//     input  wire [32-1:0] ina, inb,
+//     input  wire clk,
+//     input  wire rst_n, 
+//     output reg  g, // a > b
+//     output reg  e, // a = b
+//     output reg  ready_n); // 終了信号(1だと動作中)
+// 
+//     reg [2-1:0] count;
+//     reg [32-1:0] rega, regb;
+//     reg [8-1:0] a,b;
+//     wire g8, e8;
+// 
+//     comp_8 comp_8(a, b, g8, e8); 
+// 
+//     always @(posedge clk) begin
+//         if (!rst_n) begin
+//             count <= 0;
+//             g <= 0;
+//             e <= 0;
+//             rega <= ina;
+//             regb <= inb;
+//             a <= ina[32-1:24];
+//             b <= inb[32-1:24];
+//             ready_n <= 1;
+//         end else begin
+//             if (g8 == 1) begin // 大きかったらそこで止める
+//                 g <= 1;
+//                 e <= 0;
+//                 ready_n <= 0;
+//             end else if (!e8) begin // 等しくなかったらそこでやめる
+//                 g <= 0;
+//                 e <= 0;
+//                 ready_n <= 0;
+//             end else begin 
+//                 if (count == 2'b11) begin
+//                     g <= 0;
+//                     e <= 1;
+//                     ready_n <= 0;
+//                 end else begin
+//                     a <= (rega >> 8*(2-count));
+//                     b <= (regb >> 8*(2-count));
+//                     count <= count + 1;
+//                 end
+//             end
+//         end
+//     end
+// endmodule
 
-// 32bit比較器
-// a > b -> 10, a < b -> 00, a == b -> 01を返す
-module comp_32(
-    input  wire [32-1:0] ina, inb,
-    input  wire clk,
-    input  wire rst_n, 
-    output reg  g, // a > b
-    output reg  e, // a = b
-    output reg  ready_n); // 終了信号(1だと動作中)
+// 2の補数を計算する
+module comp_64(
+    input wire [64-1:0] ina,
+    input wire clk,
+    input wire rst_n,
+    output wire [64-1:0] result,
+    output wire ready_n);
 
-    reg [2-1:0] count;
-    reg [32-1:0] rega, regb;
-    reg [8-1:0] a,b;
-    wire g8, e8;
+    reg [64-1:0] rega;
 
-    comp_8 comp_8(a, b, g8, e8); 
-
+    add_64 add_64(~rega, 64'd1, clk, rst_n, result, ready_n);
     always @(posedge clk) begin
         if (!rst_n) begin
-            count <= 0;
-            g <= 0;
-            e <= 0;
             rega <= ina;
-            regb <= inb;
-            a <= ina[32-1:24];
-            b <= inb[32-1:24];
+        end
+    end
+endmodule
+
+// 符号つき64bitと64bitの加算器
+module add_64(
+    input  wire [64-1:0] ina, inb,
+    input  wire clk,
+    input  wire rst_n,
+    output reg [64-1:0] result,
+    output reg ready_n);
+    
+    reg  [4-1:0] count;
+    reg  status;
+    reg [64-1:0] rega, regb;
+    wire [9-1:0] res;
+    reg  [8-1:0] a,b;
+    reg carry;
+
+    assign res = a + b + carry;
+
+    always @(posedge clk) begin
+        //reset operations
+        if (!rst_n) begin
+            count  <= 0;
+            status <= 0;
+            result <= 0;
+            carry  <= 0;
+	        rega   <= ina;
+	        regb   <= inb;
+            a      <= ina[8-1:0];
+            b      <= inb[8-1:0];
             ready_n <= 1;
         end else begin
-            if (g8 == 1) begin // 大きかったらそこで止める
-                g <= 1;
-                e <= 0;
+            if (status >= 1'd1) begin
                 ready_n <= 0;
-            end else if (!e8) begin // 等しくなかったらそこでやめる
-                g <= 0;
-                e <= 0;
-                ready_n <= 0;
-            end else begin 
-                if (count == 2'b11) begin
-                    g <= 0;
-                    e <= 1;
-                    ready_n <= 0;
-                end else begin
-                    a <= (rega >> 8*(2-count));
-                    b <= (regb >> 8*(2-count));
+            end else if (status >= 1'd0) begin
+                if (count <= 4'd7) begin
+                    a <= (rega >> (8*(count+1)));
+                    b <= (regb >> (8*(count+1)));
+                    carry <= res[9-1];
                     count <= count + 1;
+                    case (count)
+                        4'd0 : result[8-1:0]   <= res[8-1:0];
+                        4'd1 : result[16-1:8]  <= res[8-1:0];
+                        4'd2 : result[24-1:16] <= res[8-1:0];
+                        4'd3 : result[32-1:24] <= res[8-1:0];
+                        4'd4 : result[40-1:32] <= res[8-1:0];
+                        4'd5 : result[48-1:40] <= res[8-1:0];
+                        4'd6 : result[56-1:48] <= res[8-1:0];
+                        4'd7 : begin 
+                            result[64-1:56] <= res[8-1:0];
+                            status <= status + 1;
+                        end
+                        default : begin end
+                    endcase
+                end else begin
                 end
             end
         end
     end
 endmodule
 
-// 32bitと32bitの加算器
-module add_32(
-    input  wire [32-1:0] ina, inb,
+// 64bit減算器
+module sub_64(
+    input  wire [64-1:0] ina, inb,
     input  wire clk,
     input  wire rst_n,
-    output reg [64-1:0] result);
+    output wire [64-1:0] result,
+    output wire ready_n);
     
-    reg  [3-1:0] count;
-    reg [32-1:0] rega, regb;
-    wire [9-1:0] res;
-    reg  [8-1:0] a,b;
-    reg carry;
+    reg  [2-1:0] status;
+    reg [64-1:0] rega, regb;
+    wire [64-1:0] compb;
+    reg rst_n_comp, rst_n_add;
+    wire ready_n_comp, ready_n_add;
 
-    assign res = a + b + carry;
+    assign ready_n = ready_n_add;
 
+    comp_64 comp_64(regb, clk, rst_n_comp, compb, ready_n_comp);
+    add_64  add_64(rega, compb, clk, rst_n_add, result, ready_n_add);
     always @(posedge clk) begin
         //reset operations
         if (!rst_n) begin
-            count <= 0;
-            result [64-1:0] <= 0;
-            carry <= 0;
-	    rega <= ina;
-	    regb <= inb;
-            a <= ina[8-1:0];
-            b <= inb[8-1:0];
-        end else begin
-            // RT operations
-            case (count)
-                3'b000 : begin
-                    a <= rega[16-1:8];
-                    b <= regb[16-1:8];
-		    carry <= res[9-1];
-		    result[8-1:0] <= res[8-1:0];
-		    count <= count + 1;
-                end
-                3'b001 : begin
-                    a <= rega[24-1:16];
-                    b <= regb[24-1:16];
-		    result[16-1:8] <= res[8-1:0];
-		    carry <= res[9-1];
-		    count <= count + 1;
-                end
-                3'b010 : begin
-                    a <= rega[32-1:24];
-                    b <= regb[32-1:24];
-		    result[24-1:16] <= res[8-1:0];
-		    carry <= res[9-1];
-		    count <= count + 1;
-                end
-		3'b011 : begin
-		    result[32-1:24] <= res[8-1:0];
-		    count <= count + 1;
-		    carry <= res[9-1];
-		end
-		default : begin
-		end
-	    endcase
-        end
-    end
-endmodule 
-
-// 32bit減算器
-module sub_32(
-    input  wire [32-1:0] ina, inb,
-    input  wire clk,
-    input  wire rst_n,
-    output reg [64-1:0] result);
-    
-    reg  [3-1:0] count;
-    reg [32-1:0] rega, regb;
-    wire [9-1:0] res;
-    reg  [8-1:0] a,b;
-    reg carry;
-
-    assign res = a + b + carry;
-
-    always @(posedge clk) begin
-        //reset operations
-        if (!rst_n) begin
-            count <= 0;
-            result [64-1:0] <= 0;
-            carry <= 0;
+            rst_n_comp <= 0;
+            rst_n_add <= 0;
+            status <= 0;
 	        rega <= ina;
 	        regb <= inb;
-            a <= ina[8-1:0];
-            b <= inb[8-1:0];
         end else begin
             // RT operations
-            case (count)
-                3'b000 : begin
-                    a <= rega[16-1:8];
-                    b <= regb[16-1:8];
-		            carry <= res[9-1];
-		            result[8-1:0] <= res[8-1:0];
-		            count <= count + 1;
+            case (status)
+                2'd0 : begin
+                    if (!rst_n_comp) begin
+                        rst_n_comp <= 1;
+                        status <= status + 1;
+                    end
                 end
-                3'b001 : begin
-                    a <= rega[24-1:16];
-                    b <= regb[24-1:16];
-		            result[16-1:8] <= res[8-1:0];
-		            carry <= res[9-1];
-		            count <= count + 1;
+                2'd1 : begin
+                    if (!ready_n_comp) begin
+                        rst_n_add <= 1;
+                        status <= status + 1;
+                    end 
                 end
-                3'b010 : begin
-                    a <= rega[32-1:24];
-                    b <= regb[32-1:24];
-		            result[24-1:16] <= res[8-1:0];
-		            carry <= res[9-1];
-		            count <= count + 1;
+                2'd2 : begin
+                    if (!ready_n_add) begin
+                        status <= status + 1;
+                    end
                 end
-		        3'b011 : begin
-		            result[32-1:24] <= res[8-1:0];
-		            count <= count + 1;
-		            carry <= res[9-1];
-		        end
-		        default : begin
-		        end
+		        default : begin end
 	        endcase
         end
     end

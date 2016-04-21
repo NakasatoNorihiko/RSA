@@ -25,7 +25,7 @@ module gcd_32(
         end else begin
             if (status >= 2'd2) begin
                 ready_n <= 0;
-            end if (status >= 2'd1) begin
+            end else if (status >= 2'd1) begin
                 if (!rst_n_mul) begin 
                     rst_n_mul <= 1;
                 end else if (!ready_n_mul & rst_n_mul) begin
