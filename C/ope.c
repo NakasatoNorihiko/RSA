@@ -88,11 +88,63 @@ void mul_one(unsigned char *a, unsigned char b, unsigned char *ans, unsigned cha
     return;
 }
 
-// n+1桁の整数をn桁の整数で除算する
-// void div_np1_n(unsigned char *dividend, unsigned char *divisor, unsigned char *ans, unsigned char n) 
+// n+1桁(256進数)の整数をn桁(256進数）の整数で除算する
+// void div_np1_n(unsigned char *a, unsigned char *b, unsigned char *ans, unsigned char n) 
 // {
-//     
+//     int D = 256;
+//     unsigned char k = (unsigned char)(D/((int)b[n-1]+1));
+//     unsigned char ak[8], bk[8];
+//     mul(a, k, ak, n+1);
+//     mul(b, k, bk, n);
 // }
+
+// n+1桁（256進数）の整数をn桁（256進数）の整数で除算する
+void div_np1_n_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned int *r, unsigned int n) 
+{
+    int D = 16; // 2**d = D
+    int d = 4;  // 2**d = D
+    int qq; // 仮の商
+    int k = 0;  // ずらす回数
+    unsigned int ina, inb;
+
+    ina = *a;
+    inb = *b;
+    *q = 0;
+    *r = 0;
+    while ((inb / pow_int(2, n-1)) < D/2) {
+        ina = ina << 1;
+        inb = inb << 1;
+        k++;
+    }
+
+    if ((ina >> (d*(n-1))) > ((inb >> (d*(n-1)))*D)) { // inaが大きすぎる場合
+        qq = (ina >> d*n) / (inb >> (d*(n-1)));
+        if (qq * inb > ina) {
+            *q = (qq - 1)*D;
+        } else {
+            *q = qq*D;
+        }
+        ina -= (*q)*inb;
+    }
+    printf("%d = %d *  %d + %d\n", ina, inb, *q, *r);
+
+    qq = (ina >> d*(n-1)) / (inb >> d*(n-1));
+    if (qq == 0) {
+        *r = ina >> k;
+        printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
+        return;
+    }
+
+    if (qq * inb > ina) {
+        *q += qq - 1;
+        *r =(ina - *q * inb) >> k;
+    } else {
+        *q += qq;
+        *r = (ina - *q * inb) >> k;
+    }
+    printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
+}
+
 int pow_int(int x, int n)
 {
     int i;
@@ -127,7 +179,7 @@ void right_shift(unsigned char *ori, unsigned char *res, unsigned char n, unsign
         }
     }
 }
-// a > b なら1, a < bなら-1, a = bなら0を返す
+// *a > b なら1, a < bなら-1, a = bなら0を返す
 int comp(unsigned char *a, unsigned char *b, unsigned char n) 
 {
     int i = n-1;
