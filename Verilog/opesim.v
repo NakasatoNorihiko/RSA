@@ -121,38 +121,166 @@
 //     always #10 clk <= ~clk;
 // endmodule
 
-module sub_64sim();
-    reg [64-1:0] ina, inb;
-    reg clk, rst_n;
-    wire [64-1:0] result;
-    wire [64-1:0] inab;
-    wire g, e, ready_n;
+// module sub_64sim();
+//     reg [64-1:0] ina, inb;
+//     reg clk, rst_n;
+//     wire [64-1:0] result;
+//     wire [64-1:0] inab;
+//     wire g, e, ready_n;
+// 
+//     assign inab = ina + (~inb+1);
+// 
+//     sub_64 sub_64(ina, inb, clk, rst_n, result, ready_n);
+// 
+//     initial begin
+// 	$dumpfile("sub_64sim.vcd");
+// 	$dumpvars;
+//         $monitor("%t: %h - %h => %h(%h)", $time, ina, inb, result, inab);
+// 	clk <= 0;
+// 	rst_n <= 0;
+//     end
+// 
+//     initial begin
+//         #100 
+// 	    ina <= 64'h00000001;
+// 	    inb <= 64'h00000001;
+// 	#20
+// 	    rst_n <= 1;
+// 	#1000
+// 	    rst_n <= 0;
+// 	#100
+// 	    inb <= 64'h03fd0010;
+// 	    ina <= 64'h01da0100;
+// 	#20
+// 	    rst_n <= 1;
+// 	#1000
+// 	    $finish;
+//     end
+// 
+//     always #5 clk <= ~clk;
+// endmodule
 
-    assign inab = ina + (~inb+1);
+//module size_64sim();
+//    reg [64-1:0] a;
+//    reg clk, rst_n;
+//    wire [8-1:0] size;
+//    wire ready_n;
+//
+//    size_64 size_64(a, clk, rst_n, size, ready_n);
+//
+//    initial begin
+//	$dumpfile("size_64sim.vcd");
+//	$dumpvars;
+//        $monitor("%t: %d %h => %d", $time, a, a, size);
+//	clk <= 0;
+//	rst_n <= 0;
+//    end
+//
+//    initial begin
+//    #100 
+//	    a <= $random;
+//	#20
+//	    rst_n <= 1;
+//	#1000
+//	    rst_n <= 0;
+//	#100
+//	    a <= $random;
+//	#20
+//	    rst_n <= 1;
+//	#1000
+//	    rst_n <= 0;
+//	#100
+//	    a <= $random;
+//	#20
+//	    rst_n <= 1;
+//	#1000
+//	    rst_n <= 0;
+//	#100
+//	    a <= $random;
+//	#20
+//	    rst_n <= 1;
+//	#1000
+//	    rst_n <= 0;
+//	#100
+//	    a <= $random;
+//	#20
+//	    rst_n <= 1;
+//	#1000
+//	    rst_n <= 0;
+//	#1000
+//	    $finish;
+//    end
+//
+//    always #5 clk <= ~clk;
+//endmodule
+module div_6464_nsim();
+    reg [64-1:0] a, b;
+    reg clk, rst_n_size, rst_n_div;
+    wire [8-1:0] size;
+    wire [64-1:0] q,r;
+    wire ready_n_size, ready_n_div;
 
-    sub_64 sub_64(ina, inb, clk, rst_n, result, ready_n);
+    size_64 size_64(b, clk, rst_n_size, size, ready_n_size);
+    div_6464_n div_6464_n(a, b, size, clk, rst_n_div, q, r, ready_n_div);
 
     initial begin
-	$dumpfile("sub_64sim.vcd");
+	$dumpfile("div_6464sim.vcd");
 	$dumpvars;
-        $monitor("%t: %h - %h => %h(%h)", $time, ina, inb, result, inab);
+        $monitor("%t: %d %h => %d", $time, a, a, size);
 	clk <= 0;
-	rst_n <= 0;
+	rst_n_size <= 0;
+    rst_n_div <= 0;
     end
 
     initial begin
-        #100 
-	    ina <= 64'h00000001;
-	    inb <= 64'h00000001;
+    #100 
+	    a <= $random;
+        b <= $random;
 	#20
-	    rst_n <= 1;
+	    rst_n_size <= 1;
+    #1000
+        rst_n_div <= 1;
 	#1000
-	    rst_n <= 0;
+	    rst_n_size <= 0;
+        rst_n_div <= 0;
 	#100
-	    inb <= 64'h03fd0010;
-	    ina <= 64'h01da0100;
+	    a <= $random;
+        b <= $random;
 	#20
-	    rst_n <= 1;
+	    rst_n_size <= 1;
+    #1000
+        rst_n_div <= 1;
+	#1000
+	    rst_n_size <= 0;
+        rst_n_div <= 0;
+	#100
+	    a <= $random;
+        b <= $random;
+	#20
+	    rst_n_size <= 1;
+    #1000
+        rst_n_div <= 1;
+	#1000
+	    rst_n_size <= 0;
+        rst_n_div <= 0;
+	#100
+	    a <= $random;
+        b <= $random;
+	#20
+	    rst_n_size <= 1;
+    #1000
+        rst_n_div <= 1;
+	#1000
+	    rst_n_size <= 0;
+	#100
+	    a <= $random;
+        b <= $random;
+	#20
+	    rst_n_size <= 1;
+    #1000
+        rst_n_div <= 1;
+	#1000
+	    rst_n_size <= 0;
 	#1000
 	    $finish;
     end

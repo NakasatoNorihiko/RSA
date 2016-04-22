@@ -52,7 +52,7 @@ void sub(unsigned char *a, unsigned char *b, unsigned char* diff, unsigned char 
 // nバイト整数同士の掛け算で2nバイトの整数を生む
 void mul(unsigned char *a, unsigned char *b, unsigned char* ans, unsigned char n)
 {
-    char res_one[n+1];
+    unsigned char res_one[n+1];
     int i, j;
     for (i = 0; i < 2*n; i++) {
         ans[i] = 0;
@@ -98,7 +98,7 @@ void mul_one(unsigned char *a, unsigned char b, unsigned char *ans, unsigned cha
 //     mul(b, k, bk, n);
 // }
 
-// n+1桁（256進数）の整数をn桁（256進数）の整数で除算する
+// n+1桁（16進数）の整数をn桁（16進数）の整数で除算する
 void div_np1_n_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned int *r, unsigned int n) 
 {
     int D = 16; // 2**d = D
@@ -111,38 +111,86 @@ void div_np1_n_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned i
     inb = *b;
     *q = 0;
     *r = 0;
+
+    if (ina == 0) {
+        return;
+    }
+
     while ((inb / pow_int(2, n-1)) < D/2) {
         ina = ina << 1;
         inb = inb << 1;
         k++;
     }
 
-    if ((ina >> (d*(n-1))) > ((inb >> (d*(n-1)))*D)) { // inaが大きすぎる場合
-        qq = (ina >> d*n) / (inb >> (d*(n-1)));
-        if (qq * inb > ina) {
-            *q = (qq - 1)*D;
-        } else {
-            *q = qq*D;
-        }
-        ina -= (*q)*inb;
-    }
     printf("ina=%d inb=%d *q=%d *r=%d\n", ina, inb, *q, *r);
+    if ((ina >> (d*n)) > ((inb >> (d*(n-1))))) { // inaが大きすぎる場合
+        printf("big ina\n");
+        qq = (ina >> d*n) / (inb >> (d*(n-1)));
+        while (qq * inb > ina && qq > 0) {
+            qq--;
+        }
+        *q = qq*D;
+        *r = (ina - qq *inb*D);
+        ina -= (*q)*inb;
+        printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
+    }
+//    printf("ina=%d inb=%d *q=%d *r=%d\n", ina, inb, *q, *r);
 
     qq = (ina >> d*(n-1)) / (inb >> d*(n-1));
     if (qq == 0) {
         *r = ina >> k;
-        printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
+        printf("%x = %x *  %x + %x\n", *a, *b, *q, *r);
         return;
     }
 
-    if (qq * inb > ina) {
-        *q += qq - 1;
-        *r = (ina - qq * inb) >> k;
-    } else {
-        *q += qq;
-        *r = (ina - qq * inb) >> k;
+    printf("ina=%x inb=%x qq=%x *q=%x\n", ina, inb, qq, *q);
+    
+    while (qq * inb > ina && qq > 0) {
+        qq--;
+        printf("ina=%d inb=%d qq=%d *q=%d\n", ina, inb, qq, *q);
     }
-    printf("%d = %d *  %d + %d\n", *a, *b, *q, *r);
+    *q += qq;
+    *r = (ina - qq * inb) >> k;
+
+    printf("%x = %x *  %x + %x\n", *a, *b, *q, *r);
+}
+
+void div_int(unsigned int *a, unsigned int *b, unsigned int *q, unsigned int *r)
+{
+    int D = 16;
+    int d = 4;
+    int i;
+    unsigned int ina = *a;
+    unsigned int inb = *b;
+    unsigned int bufa = *a;
+    unsigned int bufq, bufr;
+    int sizea = (size(*a) + d-1) / d;
+    int sizeb = (size(*b) + d-1) / d;
+    *q = 0;
+    *r = 0;
+    if (sizea == sizeb) {
+        div_np1_n_int(&bufa, &inb, &bufq, &bufr, sizeb);
+        *q = bufq;
+        *r = bufr;
+        return;
+    }   
+
+    bufa = bufa >> (sizea - sizeb - 1) * d;
+    for (i = (sizea - sizeb - 1)*d; i >= 0; i -= d) { 
+        printf("bufa = %d bufb=%d\n", bufa, inb); 
+        div_np1_n_int(&bufa, &inb, &bufq, &bufr, sizeb);
+        *q += (bufq << i);
+        bufa = (bufr << d) + (*a >> (i-d)) % D;
+    }
+    *r = bufr;
+    return;
+}
+
+int size(unsigned int a)
+{
+    int size = 0;
+    while ((a >> size) != 0) size++;
+    return size;
 }
 
 int pow_int(int x, int n)

@@ -270,4 +270,114 @@ module mul_3232(
     end 
 endmodule
 
-// 
+// 64bit / 64bitの除算機
+module div_6464(
+    input wire [64-1:0] a, b,
+    input wire clk,
+    input wire rst_n,
+    output reg [64-1:0] q, r,
+    output reg ready_n);
+
+    reg [64-1:0] rega, regb;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            rega <= a;
+            regb <= b;
+            q <= 0;
+            r <= 0;
+            ready_n <= 1;
+        end else begin
+            
+        end
+    end
+endmodule
+
+// 64bit（n+1桁、16進数） / 64bitの除算機（n桁、16進数）
+module div_6464_n(
+    input wire [64-1:0] a, b,
+    input wire [8-1:0] n,
+    input wire clk,
+    input wire rst_n,
+    output reg [64-1:0] q, r,
+    output reg ready_n);
+    
+    reg [64-1:0] rega, regb;
+    reg [4-1:0] status;
+    reg [8-1:0] qq;
+    wire [8-1:0] shiftrega, shiftregb;
+//    wire [64-1:0] shiftregabuf, shiftregbbuf;
+
+    assign shiftrega = (rega >> 4*n);
+    assign shiftregb = (regb >> 4*(n-1));
+    
+    mul
+
+//    assign shiftrega = shiftregabuf[8-1:0];
+//    assign shiftregb = shiftregbbuf[8-1:0];
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            // reset operations
+            rega <= a;
+            regb <= b;
+            q <= 0;
+            qq <= 0;
+            r <= 0;
+            ready_n <= 1;
+            status <= 0;
+        end else begin
+            if (status == 0) begin
+                if (rega == 0) begin
+                    status <= 4'd6;
+                    ready_n <= 0;
+                end
+                if ((regb >> (4*n-1)) == 0) begin
+                    rega <= rega << 1;
+                    regb <= regb << 1;
+                end
+                status <= 4'd1;
+            end else if (status == 1) begin
+                if ((rega >> (4*n)) > (regb >> (4*(n-1)))) begin
+                    qq <= shiftrega / shiftregb;
+                end
+                status <= 2;
+            end else if (status == 2) begin
+                if () begin
+                    qq <= qq - 1;
+                end else begin
+                    status <= 3;
+                end
+            end else if (status == 3) begin
+                q <= qq;
+                r <= 
+                rega <= 
+            end
+        end
+    end 
+endmodule
+
+module size_64(
+    input wire [64-1:0] a,
+    input wire clk,
+    input wire rst_n,
+    output reg [8-1:0] size, // 0-16を想定、16進数での桁数を示す
+    output reg ready_n);
+
+    reg [2-1:0] status;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            // reset operation
+            size <= 0;
+            ready_n <= 1;
+        end else begin
+            // RT operation
+            if ((a >> size*4) != 0) begin 
+                size <= size + 1;
+            end else begin
+                ready_n <= 0;
+            end
+        end
+    end
+endmodule

@@ -11,7 +11,17 @@ int main(int argc, char *argv[]) {
     unsigned int a_int = atoi(argv[1]);
     unsigned int b_int = atoi(argv[2]);
     unsigned int q, r;
-    div_np1_n_int(&a_int, &b_int, &q, &r, 1);
+//    div_int(&a_int, &b_int, &q, &r);
+//
+    for (i = 0; i < 100; i++) {
+        a_int = rand() % 100000;
+        b_int = rand() % a_int + 1;
+        q = 0;
+        r = 0;
+        div_int(&a_int, &b_int, &q, &r);
+        printf("[%d = %d * %d + %d]\n", a_int, b_int, q, r);
+        printf("[%x = %x * %x + %x]\n", a_int, b_int, q, r);
+    }
 //     printf("%u %u -> %u\n", a_int, b_int, gcd);
     for (i = 0; i < N; i++) {
         a[i] = (unsigned char)((atoi(argv[1]) / pow_int(256, i)) % 256);
