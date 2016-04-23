@@ -88,6 +88,45 @@ void mul_one(unsigned char *a, unsigned char b, unsigned char *ans, unsigned cha
     return;
 }
 
+// 2進数の整数を2進数の整数で除算する
+void div_binary(unsigned int *a, unsigned int *b, unsigned int *q, unsigned int *r)
+{
+    int qq,i;
+    int sizea = 0;
+    int sizeb = 0;
+    unsigned int ina, inb;
+
+    ina = *a;
+    inb = *b;
+    *q = 0;
+    *r = 0;
+
+    while ((ina >> sizea) != 0) sizea++;
+    while ((inb >> sizeb) != 0) sizeb++;
+
+    printf("sizea = %d sizeb=%d\n", sizea, sizeb);
+    if (sizea < sizeb) {
+        *q = 0;
+        *r = *a;
+        printf("bad size\n");
+    }
+
+//     printf("%x = %x * %x + %x\n", *a, inb, *q, ina);
+    // iは最上位桁
+    for (i = sizea; i >= sizeb; i--) {
+        *q  = *q << 1;
+//         printf("%u\n", (ina >> (i-1))%2);
+//        if ((ina >> (i-1)) % 2 == 1) {
+//             printf("%d %d\n", ina, inb << (i-sizeb));
+            if ((ina >= (inb << (i-sizeb)))) {
+                ina = ina - (inb << (i-sizeb));
+                (*q)++;
+            }
+//        }
+        printf("%x = %x * %x + %x\n", *a, inb, (*q << (i-sizeb)), ina);
+    }
+    *r = ina;
+}
 // n+1桁(256進数)の整数をn桁(256進数）の整数で除算する
 // void div_np1_n(unsigned char *a, unsigned char *b, unsigned char *ans, unsigned char n) 
 // {

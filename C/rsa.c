@@ -14,19 +14,19 @@ int main(int argc, char *argv[]) {
 //    div_int(&a_int, &b_int, &q, &r);
 //
     for (i = 0; i < 100; i++) {
-        a_int = rand() % 100000;
+        a_int = rand() % 100000 + 1;
         b_int = rand() % a_int + 1;
         q = 0;
         r = 0;
-        div_int(&a_int, &b_int, &q, &r);
+        div_binary(&a_int, &b_int, &q, &r);
         printf("[%d = %d * %d + %d]\n", a_int, b_int, q, r);
         printf("[%x = %x * %x + %x]\n", a_int, b_int, q, r);
     }
 //     printf("%u %u -> %u\n", a_int, b_int, gcd);
-    for (i = 0; i < N; i++) {
-        a[i] = (unsigned char)((atoi(argv[1]) / pow_int(256, i)) % 256);
-        b[i] = (unsigned char)((atoi(argv[2]) / pow_int(256, i)) % 256);
-    }
+//     for (i = 0; i < N; i++) {
+//         a[i] = (unsigned char)((atoi(argv[1]) / pow_int(256, i)) % 256);
+//         b[i] = (unsigned char)((atoi(argv[2]) / pow_int(256, i)) % 256);
+//     }
 //    printf("%u (%u)\n", (unsigned int)ans[1]*256 + (unsigned int)ans[0], atoi(argv[1])*atoi(argv[2]));
     
     return 0;
