@@ -178,31 +178,31 @@
 //
 //    initial begin
 //    #100 
-//	    a <= $random;
+//	    a <= $unsigned($random);
 //	#20
 //	    rst_n <= 1;
 //	#1000
 //	    rst_n <= 0;
 //	#100
-//	    a <= $random;
+//	    a <= $unsigned($random);
 //	#20
 //	    rst_n <= 1;
 //	#1000
 //	    rst_n <= 0;
 //	#100
-//	    a <= $random;
+//	    a <= $unsigned($random);
 //	#20
 //	    rst_n <= 1;
 //	#1000
 //	    rst_n <= 0;
 //	#100
-//	    a <= $random;
+//	    a <= $unsigned($random);
 //	#20
 //	    rst_n <= 1;
 //	#1000
 //	    rst_n <= 0;
 //	#100
-//	    a <= $random;
+//	    a <= $unsigned($random);
 //	#20
 //	    rst_n <= 1;
 //	#1000
@@ -213,75 +213,62 @@
 //
 //    always #5 clk <= ~clk;
 //endmodule
-module div_6464_nsim();
+module div_binarysim();
     reg [64-1:0] a, b;
-    reg clk, rst_n_size, rst_n_div;
+    reg clk, rst_n_div;
     wire [8-1:0] size;
     wire [64-1:0] q,r;
     wire ready_n_size, ready_n_div;
+    wire [64-1:0] correctq, correctr;
 
-    size_64 size_64(b, clk, rst_n_size, size, ready_n_size);
-    div_6464_n div_6464_n(a, b, size, clk, rst_n_div, q, r, ready_n_div);
+    assign correctq = a / b;
+    assign correctr = a % b;
+
+    div_binary div_binary(a, b, clk, rst_n_div, q, r, ready_n_div);
 
     initial begin
-	$dumpfile("div_6464sim.vcd");
+	$dumpfile("div_binary.vcd");
 	$dumpvars;
-        $monitor("%t: %d %h => %d", $time, a, a, size);
-	clk <= 0;
-	rst_n_size <= 0;
+        $monitor("%t: %d = %d * %d + %d(%d = %d * %d + %d)", $time, a, b, q, r, a, b, correctq, correctr);
+	clk <= 0; 
     rst_n_div <= 0;
     end
 
     initial begin
     #100 
-	    a <= $random;
-        b <= $random;
+	    a <= $unsigned($random) % 100000;
+        b <= $unsigned($random) % 5000 + 1;
 	#20
-	    rst_n_size <= 1;
-    #1000
         rst_n_div <= 1;
-	#1000
-	    rst_n_size <= 0;
+	#2000
+        rst_n_div <= 0;
+	#10
+	    a <= $unsigned($random) % 100000;
+        b <= $unsigned($random) % 5000 + 1;
+	#20
+        rst_n_div <= 1;
+	#2000
         rst_n_div <= 0;
 	#100
-	    a <= $random;
-        b <= $random;
+	    a <= $unsigned($random) % 100000;
+        b <= $unsigned($random) % 5000 + 1;
 	#20
-	    rst_n_size <= 1;
-    #1000
         rst_n_div <= 1;
-	#1000
-	    rst_n_size <= 0;
+	#2000
         rst_n_div <= 0;
 	#100
-	    a <= $random;
-        b <= $random;
+	    a <= $unsigned($random) % 100000;
+        b <= $unsigned($random) % 5000 + 1;
 	#20
-	    rst_n_size <= 1;
-    #1000
         rst_n_div <= 1;
-	#1000
-	    rst_n_size <= 0;
+	#2000
         rst_n_div <= 0;
 	#100
-	    a <= $random;
-        b <= $random;
+	    a <= $unsigned($random) % 100000;
+        b <= $unsigned($random) % 5000 + 1;
 	#20
-	    rst_n_size <= 1;
-    #1000
         rst_n_div <= 1;
-	#1000
-	    rst_n_size <= 0;
-	#100
-	    a <= $random;
-        b <= $random;
-	#20
-	    rst_n_size <= 1;
-    #1000
-        rst_n_div <= 1;
-	#1000
-	    rst_n_size <= 0;
-	#1000
+	#2000
 	    $finish;
     end
 
