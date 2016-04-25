@@ -237,35 +237,35 @@ module div_binarysim();
     initial begin
     #100 
 	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 5000 + 1;
+        b <= $unsigned($random) % 50000 + 1;
 	#20
         rst_n_div <= 1;
 	#2000
         rst_n_div <= 0;
 	#10
 	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 5000 + 1;
+        b <= $unsigned($random) % 50000 + 1;
 	#20
         rst_n_div <= 1;
 	#2000
         rst_n_div <= 0;
 	#100
 	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 5000 + 1;
+        b <= $unsigned($random) % 50000 + 1;
 	#20
         rst_n_div <= 1;
 	#2000
         rst_n_div <= 0;
 	#100
 	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 5000 + 1;
+        b <= $unsigned($random) % 50000 + 1;
 	#20
         rst_n_div <= 1;
 	#2000
         rst_n_div <= 0;
 	#100
 	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 5000 + 1;
+        b <= $unsigned($random) % 50000 + 1;
 	#20
         rst_n_div <= 1;
 	#2000
