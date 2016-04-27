@@ -124,20 +124,20 @@
 // 
 //     always #5 clk <= ~clk;
 // endmodule
-module lcmsim();
-    reg [32-1:0] ina;
-    reg [32-1:0]  inb;
+module gcd_64sim();
+    reg [64-1:0] ina;
+    reg [64-1:0]  inb;
     reg clk, rst_n;
     wire [64-1:0] result;
     wire ready_n;
-    wire [64-1:0] inab;
+    wire [128-1:0] inab;
 
-    lcm_32 lcm_32(ina, inb, clk, rst_n, result, ready_n);
+    gcd_64 gcd_64(ina, inb, clk, rst_n, result, ready_n);
 
     assign inab = ina * inb;
 
     initial begin
-	$dumpfile("lcmsim.vcd");
+	$dumpfile("gcd_64sim.vcd");
 	$dumpvars;
         $monitor("%t: %d *  %d => %d (%h) %b", $time, ina, inb, result, inab, ready_n);
 	clk <= 0;
@@ -150,22 +150,67 @@ module lcmsim();
 	    inb <= 120;
 	#10
 	    rst_n <= 1;
-	#4000
+	#2000
 	    rst_n <= 0;
 	#10
 	    ina <= 2502;
 	    inb <= 122;
 	#10
 	    rst_n <= 1;
-    #4000
+    #2000
         rst_n <= 0;
     #100
         ina <= 1402;
         inb <= 291;
     #20 rst_n <= 1;
-	#4000
+	#2000
 	    $finish;
     end
 
     always #5 clk <= ~clk;
 endmodule
+// module lcmsim();
+//     reg [32-1:0] ina;
+//     reg [32-1:0]  inb;
+//     reg clk, rst_n;
+//     wire [64-1:0] result;
+//     wire ready_n;
+//     wire [64-1:0] inab;
+// 
+//     lcm_32 lcm_32(ina, inb, clk, rst_n, result, ready_n);
+// 
+//     assign inab = ina * inb;
+// 
+//     initial begin
+// 	$dumpfile("lcmsim.vcd");
+// 	$dumpvars;
+//         $monitor("%t: %d *  %d => %d (%h) %b", $time, ina, inb, result, inab, ready_n);
+// 	clk <= 0;
+// 	rst_n <= 0;
+//     end
+// 
+//     initial begin
+//     #100 
+// 	    ina <= 640;
+// 	    inb <= 120;
+// 	#10
+// 	    rst_n <= 1;
+// 	#4000
+// 	    rst_n <= 0;
+// 	#10
+// 	    ina <= 2502;
+// 	    inb <= 122;
+// 	#10
+// 	    rst_n <= 1;
+//     #4000
+//         rst_n <= 0;
+//     #100
+//         ina <= 1402;
+//         inb <= 291;
+//     #20 rst_n <= 1;
+// 	#4000
+// 	    $finish;
+//     end
+// 
+//     always #5 clk <= ~clk;
+// endmodule

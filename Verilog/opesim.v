@@ -213,67 +213,68 @@
 //
 //    always #5 clk <= ~clk;
 //endmodule
-module div_binarysim();
-    reg [64-1:0] a, b;
-    reg clk, rst_n_div;
-    wire [8-1:0] size;
-    wire [64-1:0] q,r;
-    wire ready_n_size, ready_n_div;
-    wire [64-1:0] correctq, correctr;
+// module div_binarysim();
+//     reg [64-1:0] a, b;
+//     reg clk, rst_n_div;
+//     wire [8-1:0] size;
+//     wire [64-1:0] q,r;
+//     wire ready_n_size, ready_n_div;
+//     wire [64-1:0] correctq, correctr;
+// 
+//     assign correctq = a / b;
+//     assign correctr = a % b;
+// 
+//     div_binary div_binary(a, b, clk, rst_n_div, q, r, ready_n_div);
+// 
+//     initial begin
+// 	$dumpfile("div_binary.vcd");
+// 	$dumpvars;
+//         $monitor("%t: %d = %d * %d + %d(%d = %d * %d + %d)", $time, a, b, q, r, a, b, correctq, correctr);
+// 	clk <= 0; 
+//     rst_n_div <= 0;
+//     end
+// 
+//     initial begin
+//     #100 
+// 	    a <= $unsigned($random) % 100000;
+//         b <= $unsigned($random) % 50000 + 1;
+// 	#20
+//         rst_n_div <= 1;
+// 	#2000
+//         rst_n_div <= 0;
+// 	#10
+// 	    a <= $unsigned($random) % 100000;
+//         b <= $unsigned($random) % 50000 + 1;
+// 	#20
+//         rst_n_div <= 1;
+// 	#2000
+//         rst_n_div <= 0;
+// 	#100
+// 	    a <= $unsigned($random) % 100000;
+//         b <= $unsigned($random) % 50000 + 1;
+// 	#20
+//         rst_n_div <= 1;
+// 	#2000
+//         rst_n_div <= 0;
+// 	#100
+// 	    a <= $unsigned($random) % 100000;
+//         b <= $unsigned($random) % 50000 + 1;
+// 	#20
+//         rst_n_div <= 1;
+// 	#2000
+//         rst_n_div <= 0;
+// 	#100
+// 	    a <= $unsigned($random) % 100000;
+//         b <= $unsigned($random) % 50000 + 1;
+// 	#20
+//         rst_n_div <= 1;
+// 	#2000
+// 	    $finish;
+//     end
+// 
+//     always #5 clk <= ~clk;
+// endmodule
 
-    assign correctq = a / b;
-    assign correctr = a % b;
-
-    div_binary div_binary(a, b, clk, rst_n_div, q, r, ready_n_div);
-
-    initial begin
-	$dumpfile("div_binary.vcd");
-	$dumpvars;
-        $monitor("%t: %d = %d * %d + %d(%d = %d * %d + %d)", $time, a, b, q, r, a, b, correctq, correctr);
-	clk <= 0; 
-    rst_n_div <= 0;
-    end
-
-    initial begin
-    #100 
-	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 50000 + 1;
-	#20
-        rst_n_div <= 1;
-	#2000
-        rst_n_div <= 0;
-	#10
-	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 50000 + 1;
-	#20
-        rst_n_div <= 1;
-	#2000
-        rst_n_div <= 0;
-	#100
-	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 50000 + 1;
-	#20
-        rst_n_div <= 1;
-	#2000
-        rst_n_div <= 0;
-	#100
-	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 50000 + 1;
-	#20
-        rst_n_div <= 1;
-	#2000
-        rst_n_div <= 0;
-	#100
-	    a <= $unsigned($random) % 100000;
-        b <= $unsigned($random) % 50000 + 1;
-	#20
-        rst_n_div <= 1;
-	#2000
-	    $finish;
-    end
-
-    always #5 clk <= ~clk;
-endmodule
 
 
 // module mul_3232sim();
@@ -321,3 +322,48 @@ endmodule
 // 
 //     always #5 clk <= ~clk;
 // endmodule
+module mul_6464sim();
+    reg [64-1:0] ina;
+    reg [64-1:0]  inb;
+    reg clk, rst_n;
+    wire [128-1:0] result;
+    wire ready_n;
+    wire [128-1:0] inab;
+
+    mul_6464 mul_6464(ina, inb, clk, rst_n, result, ready_n);
+
+    assign inab = ina * inb;
+
+    initial begin
+	$dumpfile("mul_6464sim.vcd");
+	$dumpvars;
+        $monitor("%t: %h *  %h => %h (%h) %b", $time, ina, inb, result, inab, ready_n);
+	clk <= 0;
+	rst_n <= 0;
+    end
+
+    initial begin
+        #100 
+	    ina <= 64'h00000001;
+	    inb <= 64'h00000001;
+	#10
+	    rst_n <= 1;
+	#2000
+	    rst_n <= 0;
+	#10
+	    ina <= 64'h00000010;
+	    inb <= 64'h00000100;
+	#10
+	    rst_n <= 1;
+    #2000
+        rst_n <= 0;
+    #100
+        ina <= 64'hed91f81fda13;
+        inb <= 64'hd91ae301dedd;
+    #20 rst_n <= 1;
+	#2000
+	    $finish;
+    end
+
+    always #5 clk <= ~clk;
+endmodule

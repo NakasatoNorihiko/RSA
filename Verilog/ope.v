@@ -208,6 +208,40 @@ module sub_64(
     end
 endmodule
 
+module mul_648(
+    input wire [64-1:0] ina,
+    input wire [8-1:0]  inb,
+    input wire clk,
+    input wire rst_n,
+    output reg [72-1:0] result,
+    output reg ready_n);
+
+    reg [64-1:0] rega;
+    reg [8-1:0]  regb;
+    reg [4-1:0]  count;
+    reg [8-1:0]  calca;
+    
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            // reset operations
+            result <= 0;
+            count <= 0;
+            rega <= ina;
+            regb <= inb;
+            ready_n <= 1;
+            calca <= ina;
+        end else begin
+            // RT operations
+            if (count >= 4'd9) begin
+                ready_n <= 0;
+            end else begin
+                calca <= (ina >> 8*(count+1));
+                result <= result + ((calca*regb) << 8*count);
+                count  <= count + 1;
+            end
+        end
+    end
+endmodule
 module mul_328(
     input wire [32-1:0] ina,
     input wire [8-1:0]  inb,
@@ -283,6 +317,53 @@ module mul_3232(
                     rst_n_328 <= 1;
                     if (!ready_n_328 & rst_n_328) begin
                         finish_328 <= 1;
+                    end
+                end
+            end
+        end
+    end 
+endmodule
+// 64bit * 64bitで128bitを作り出す
+module mul_6464(
+    input wire [64-1:0] ina, inb,
+    input wire clk,
+    input wire rst_n,
+    output reg [128-1:0] result,
+    output reg ready_n);
+    
+    reg [64-1:0] rega, regb;
+    reg [8-1:0]  calcb;
+    reg [4-1:0]  count;
+    wire ready_n_648; 
+    reg  finish_648; // mul_648が終わったかどうか
+    reg rst_n_648;
+    wire [72-1:0] res_648;
+
+    mul_648 mul_648(rega, calcb, clk, rst_n_648, res_648, ready_n_648);
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            result <= 0;
+            rega <= ina;
+            regb <= inb;
+            calcb <= inb;
+            ready_n <= 1;
+            rst_n_648 <= 0;
+            count <= 0;
+            finish_648 <= 0;
+        end else begin
+            if (count >= 4'd8) begin
+                ready_n <= 0;
+            end else begin
+                if (finish_648) begin // mul_648の計算が終わったなら
+                    result <= result + (res_648 << 8*(count));
+                    count <= count + 1;
+                    calcb <= (regb >> 8*(count+1));
+                    rst_n_648 <= 0;
+                    finish_648 <= 0;
+                end else begin // mul_648の計算がおわってないなら
+                    rst_n_648 <= 1;
+                    if (!ready_n_648 & rst_n_648) begin
+                        finish_648 <= 1;
                     end
                 end
             end

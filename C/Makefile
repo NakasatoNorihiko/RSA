@@ -1,6 +1,6 @@
 # プログラム名とオブジェクトファイル名
 PROGRAM = rsa
-OBJS = rsa.o ope.o gcdlcm.o
+OBJS = rsa.o ope.o gcdlcm.o create_ld.o
 
 # 定義済みマクロの再定義
 CC = gcc
@@ -23,6 +23,6 @@ clean:
 	$(RM) $(PROGRAM) $(OBJS)
 
 # ヘッダファイルの依存関係
-rsa.o: rsa.h ope.h
+rsa.o: rsa.h ope.h create_ld.h
 ope.o: rsa.h ope.h
 gcdlcm.o: rsa.h

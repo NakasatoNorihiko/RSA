@@ -10,7 +10,7 @@ module create_edsim();
 	    $dumpfile("create_edsim.vcd");
 	    $dumpvars;
         $monitor("%t: %h", $time, E);
-        L <= 0;
+        L <= 64'he91293da9dae91;
 	    clk <= 0;
 	    rst_n <= 0;
     end
@@ -18,7 +18,7 @@ module create_edsim();
     initial begin
         #100 
         rst_n <= 1;
- 	#20
+ 	#40
  	    start_n <= 1;
 // 	#100
 // 	    start_n <= 0;
@@ -31,7 +31,7 @@ module create_edsim();
 //     #100
 //         start_n <= 0;
 //     #20 start_n <= 1;
-	#2000
+	#100000
 	    $finish;
     end
 
