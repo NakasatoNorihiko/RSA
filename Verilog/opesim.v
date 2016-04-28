@@ -332,7 +332,7 @@ module mul_6464sim();
 
     mul_6464 mul_6464(ina, inb, clk, rst_n, result, ready_n);
 
-    assign inab = ina * inb;
+    assign inab = (~ina + 1) * (~inb + 1);
 
     initial begin
 	$dumpfile("mul_6464sim.vcd");
@@ -358,8 +358,8 @@ module mul_6464sim();
     #2000
         rst_n <= 0;
     #100
-        ina <= 64'hed91f81fda13;
-        inb <= 64'hd91ae301dedd;
+        ina <= 64'he792ed91f81fda13;
+        inb <= 64'he923d91ae301dedd;
     #20 rst_n <= 1;
 	#2000
 	    $finish;

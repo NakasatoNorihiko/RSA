@@ -1,3 +1,5 @@
+`define ON 1
+`define OFF 0
 // // 8bit比較器 a > b -> g:1 e:0, a == b -> 01, a < b -> 00
 // module comp_8(
 //     input wire [8-1:0] ina, inb,
@@ -242,6 +244,7 @@ module mul_648(
         end
     end
 endmodule
+
 module mul_328(
     input wire [32-1:0] ina,
     input wire [8-1:0]  inb,
@@ -276,6 +279,7 @@ module mul_328(
         end
     end
 endmodule
+
 // 32bit * 32bitで64bitを作り出す
 module mul_3232(
     input wire [32-1:0] ina, inb,
@@ -323,6 +327,141 @@ module mul_3232(
         end
     end 
 endmodule
+// 64bit * 64bitで128bitを作り出す
+//module mul_6464(
+//    input wire [64-1:0] ina, inb,
+//    input wire clk,
+//    input wire rst_n,
+//    output reg [128-1:0] result,
+//    output reg ready_n);
+//    
+//    reg [64-1:0] rega, regb, comp_in;
+//    reg [8-1:0]  calcb;
+//    reg [4-1:0]  count;
+//    wire ready_n_648, ready_n_comp; 
+//    reg rst_n_648, rst_n_comp;
+//    reg sign; // 0なら答えが正、１なら負
+//    reg waiting_n;
+//    reg Istate, S1state, S2state, Mstate, Fstate; // Initial, Signed1, Signed2, Multiple, Final
+//    wire [72-1:0] res_648;
+//    wire [64-1:0] comp_out;
+//
+//    comp_64 comp_64(comp_in, clk, rst_n_comp, comp_out, ready_n_comp);
+//    mul_648 mul_648(rega, calcb, clk, rst_n_648, res_648, ready_n_648);
+//
+//    always @(posedge clk) begin
+//        if (!rst_n) begin
+//            result <= 0;
+//            rega <= ina;
+//            regb <= inb;
+//            calcb <= inb;
+//            ready_n <= 1;
+//            comp_in <= 0;
+//            rst_n_648 <= 0;
+//            rst_n_comp <= 0;
+//            count <= 0;
+//            waiting_n <= 1;
+//            sign <= 0;
+//            Istate <= `ON;
+//            S1state <= `OFF;
+//            S2state <= `OFF;
+//            Mstate <= `OFF;
+//            Fstate <= `OFF;
+//        end else if (Istate) begin
+//            Istate <= `OFF;
+//            if (rega[63] == 1) begin // かけられる数がマイナスだったら
+//                S1state <= `ON;
+//                sign <= ~sign;
+//                comp_in <= rega;
+//            end else if (regb[63] == 1) begin // かける数がマイナスだったら
+//                S2state <= `ON;
+//                comp_in <= regb;
+//                rst_n_comp <= 1;
+//                waiting_n <= 0;
+//                sign <= ~sign;
+//            end else begin
+//                Mstate <= `ON;
+//                waiting_n <= 0;
+//            end
+//        end else if (S1state) begin
+//            if (waiting_n) begin
+//            //    comp_in <= rega;
+//                waiting_n <= 0;
+//                rst_n_comp <= 1;
+//            end else begin
+//                if (!ready_n_comp) begin
+//                    rst_n_comp <= 0;
+//                    S1state <= `OFF;
+//                    rega <= comp_out;
+//                    waiting_n <= 1;
+//                    if (regb[63] == 1) begin
+//                        S2state <= `ON;
+//                        rst_n_comp <= 0;
+//                        sign <= ~sign;
+//                        comp_in <= regb;
+//                    end else begin
+//                        Mstate <= `ON;
+//                    end
+//                end
+//            end
+//        end else if (S2state) begin
+//            if (waiting_n) begin
+//            //    comp_in <= rega;
+//                waiting_n <= 0;
+//                rst_n_comp <= 1;
+//            end else begin
+//                if (!ready_n_comp) begin
+//                    rst_n_comp <= 0;
+//                    S2state <= `OFF;
+//                    regb <= comp_out;
+//                    waiting_n <= 1;
+//                    Mstate <= `ON;
+//                end
+//            end
+////             if (!ready_n_comp) begin
+////                 rst_n_comp <= 0;
+////                 S2state <= `OFF;
+////                 regb <= comp_out;
+////                 Mstate <= `ON;
+////             end
+////             if (!rst_n_comp) begin
+////                 rst_n_comp <= 1;
+////             end
+//        end else if (Mstate) begin
+//           if (count > 4'd8) begin
+//               kkkkkkkkkkk
+//        end else if (Fstate) begin
+//            ready_n <= 0;
+//        end else begin
+//            Istate <= `OFF;
+//            S1state <= `OFF;
+//            S2state <= `OFF;
+//            Mstate <= `OFF;
+//            Fstate <= `OFF;
+//        end
+//    end
+//endmodule
+//
+//
+////         end else begin
+////             if (count >= 4'd8) begin
+////                 ready_n <= 0;
+////             end else begin
+////                 if (finish_648) begin // mul_648の計算が終わったなら
+////                     result <= result + (res_648 << 8*(count));
+////                     count <= count + 1;
+////                     calcb <= (regb >> 8*(count+1));
+////                     rst_n_648 <= 0;
+////                     finish_648 <= 0;
+////                 end else begin // mul_648の計算がおわってないなら
+////                     rst_n_648 <= 1;
+////                     if (!ready_n_648 & rst_n_648) begin
+////                         finish_648 <= 1;
+////                     end
+////                 end
+////             end
+////         end
+
 // 64bit * 64bitで128bitを作り出す
 module mul_6464(
     input wire [64-1:0] ina, inb,
